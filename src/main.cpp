@@ -14,6 +14,9 @@ void blockCout(std::mutex &mtx, std::string str)
 
 
 int main(){
+
+    size_t count_read_A = 1;
+    size_t count_read_B = 1;
     
     std::shared_ptr<Device> deviceA = std::make_shared<DeviceA>();
     std::shared_ptr<Device> deviceB = std::make_shared<DeviceB>();    
@@ -25,10 +28,9 @@ int main(){
     std::condition_variable cv;
     
 
-    std::thread threadA([&queue, &cout_mtx](std::shared_ptr<Device> device)
+    std::thread threadA([&queue, &count_read_A](std::shared_ptr<Device> device)
     {
-        int n = 2;
-        while (n--)
+        while (count_read_A--)
         {
             queue.push(std::make_shared<StartedEvent>(device));
             queue.push(std::make_shared<WorkDoneEvent>(device));
@@ -36,10 +38,9 @@ int main(){
         }
     }, deviceA);
 
-    std::thread threadB([&queue, &cout_mtx](std::shared_ptr<Device> device)
+    std::thread threadB([&queue, &count_read_B](std::shared_ptr<Device> device)
     {
-        int n = 2;
-        while (n--)
+        while (count_read_B--)
         {
             queue.push(std::make_shared<StartedEvent>(device));
             queue.push(std::make_shared<WorkDoneEvent>(device));
