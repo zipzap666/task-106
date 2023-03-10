@@ -26,7 +26,7 @@ public:
         if (cv.wait_for(u_mtx, duration, [this]
                         { return !queue.empty(); }))
         {
-            auto event = std::move(queue.front());
+            auto event = queue.front();
             queue.pop();
             return event;
         }

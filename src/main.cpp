@@ -15,7 +15,7 @@ void blockCout(std::mutex &mtx, std::string str)
 
 int main(){
 
-    size_t count_read_A = 1;
+    size_t count_read_A = 10;
     size_t count_read_B = 1;
     
     std::shared_ptr<Device> deviceA = std::make_shared<DeviceA>();
@@ -30,22 +30,22 @@ int main(){
 
     std::thread threadA([&queue, &count_read_A](std::shared_ptr<Device> device)
     {
+        queue.push(std::make_shared<StartedEvent>(device));
         while (count_read_A--)
         {
-            queue.push(std::make_shared<StartedEvent>(device));
-            queue.push(std::make_shared<WorkDoneEvent>(device));
             queue.push(std::make_shared<DataEvent>(device));
         }
+        queue.push(std::make_shared<WorkDoneEvent>(device));
     }, deviceA);
 
     std::thread threadB([&queue, &count_read_B](std::shared_ptr<Device> device)
     {
+        queue.push(std::make_shared<StartedEvent>(device));
         while (count_read_B--)
         {
-            queue.push(std::make_shared<StartedEvent>(device));
-            queue.push(std::make_shared<WorkDoneEvent>(device));
             queue.push(std::make_shared<DataEvent>(device));
         }
+        queue.push(std::make_shared<WorkDoneEvent>(device));
     }, deviceB);
 
     while(true)
@@ -53,7 +53,7 @@ int main(){
         auto event = queue.pop(time_out);
         if(event != nullptr)
         {
-            blockCout(cout_mtx, event->toString());
+           blockCout(cout_mtx, event->toString());
         }else{
             break;
         }

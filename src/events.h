@@ -22,7 +22,13 @@ protected:
 class DataEvent : public DeviceEvent
 {
 public:
-    DataEvent(std::shared_ptr<Device> device) : DeviceEvent(device){};
+    DataEvent(std::shared_ptr<Device> device) : DeviceEvent(device)
+    {
+        if(_device->getName() == "A")
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        else if (_device->getName() == "B")
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+    };
 
     std::string toString() const override
     {
@@ -33,13 +39,7 @@ public:
 class WorkDoneEvent : public DeviceEvent
 {
 public:
-    WorkDoneEvent(std::shared_ptr<Device> device) : DeviceEvent(device)
-    {
-        if(_device->getName() == "A")
-            std::this_thread::sleep_for(std::chrono::seconds(1));
-        else if (_device->getName() == "B")
-            std::this_thread::sleep_for(std::chrono::seconds(5));
-    };
+    WorkDoneEvent(std::shared_ptr<Device> device) : DeviceEvent(device){};
 
     std::string toString() const override
     {   
